@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,11 +9,12 @@ using AwsSignatureVersion4.Private;
 using Genbox.SimpleS3.Core;
 using Genbox.SimpleS3.Core.Abstracts.Enums;
 using Genbox.SimpleS3.Core.Authentication;
+using MBW.Client.BlueRiiotApi.Objects;
 using MBW.Client.BlueRiiotApi.Other;
 using MBW.Client.BlueRiiotApi.RequestsResponses;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace MBW.Client.BlueRiiotApi
@@ -59,9 +61,25 @@ namespace MBW.Client.BlueRiiotApi
 
             using var resp = await GetHttpClient().SendAsync(req, HttpCompletionOption.ResponseContentRead, token);
 
-            resp.EnsureSuccessStatusCode();
+            if (resp.Content.Headers.ContentType.MediaType != "application/json")
+                throw new Exception($"API request did not result in a Json object. Path: '{path}'.");
 
-            return JsonConvert.DeserializeObject<TResponse>(await resp.Content.ReadAsStringAsync());
+            JObject obj = Parse<JObject>(await resp.Content.ReadAsStreamAsync());
+
+            if (obj.ContainsKey("errorMessage") && obj.ContainsKey("errorType"))
+            {
+                // This is an error, regardless of what the status code is
+                throw new Exception($"API responded with an error: {obj.Value<string>("errorMessage")}. Path: '{path}'.");
+            }
+
+            if (resp.StatusCode == HttpStatusCode.OK)
+                return obj.ToObject<TResponse>();
+
+            // Something is wrong, try fetching a message
+            if (obj.TryGetValue("errorMessage", out var errorMsg) || obj.TryGetValue("message", out errorMsg))
+                throw new Exception($"API resulted in a non-success status code. Message: {errorMsg}. Path: '{path}'.");
+
+            throw new Exception($"API resulted in a non-success status code. No futher details available. Path: '{path}'.");
         }
 
         public async Task<SwimmingPoolGetResponse> GetSwimmingPools(bool deleted = false, CancellationToken token = default)

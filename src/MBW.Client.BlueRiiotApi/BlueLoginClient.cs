@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MBW.Client.BlueRiiotApi.RequestsResponses;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace MBW.Client.BlueRiiotApi
 {
@@ -23,11 +22,7 @@ namespace MBW.Client.BlueRiiotApi
 
             resp.EnsureSuccessStatusCode();
 
-            var deserializeObject = JsonConvert.DeserializeObject<LoginResponse>(await resp.Content.ReadAsStringAsync(), new JsonSerializerSettings
-            {
-                ContractResolver = new DefaultContractResolver()
-            });
-            return deserializeObject;
+            return Parse<LoginResponse>(await resp.Content.ReadAsStreamAsync());
         }
     }
 }

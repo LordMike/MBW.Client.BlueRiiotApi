@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MBW.Client.BlueRiiotApi.Objects;
 using Newtonsoft.Json;
 
 namespace MBW.Client.BlueRiiotApi.RequestsResponses
