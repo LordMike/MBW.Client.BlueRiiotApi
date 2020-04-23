@@ -34,6 +34,9 @@ namespace TestApplication
 
             var guidance = await cl.GetSwimmingPoolGuidance(pool.SwimmingPoolId);
             var guidanceHistory = await cl.GetSwimmingPoolGuidanceHistory(pool.SwimmingPoolId);
+
+            var weather = await cl.GetSwimmingPoolWeather(pool.SwimmingPoolId);
+            var weather2 = await cl.GetSwimmingPoolWeatherForecast(pool.SwimmingPoolId, DateTime.UtcNow);
         }
     }
 }

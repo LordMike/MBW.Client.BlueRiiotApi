@@ -113,5 +113,15 @@ namespace MBW.Client.BlueRiiotApi.BlueApi
         {
             return await PerformGet<SwimmingPoolGuidanceHistoryGetResponse>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}/guidance/history?lang={HttpUtility.UrlEncode(lang)}", token);
         }
+
+        public async Task<SwimmingPoolWeatherGetResponse> GetSwimmingPoolWeather(string poolId, string lang = null, CancellationToken token = default)
+        {
+            return await PerformGet<SwimmingPoolWeatherGetResponse>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}/weather?lang={HttpUtility.UrlEncode(lang)}", token);
+        }
+
+        public async Task<SwimmingPoolWeatherForecastGetResponse> GetSwimmingPoolWeatherForecast(string poolId, DateTime startDate, string lang = null, CancellationToken token = default)
+        {
+            return await PerformGet<SwimmingPoolWeatherForecastGetResponse>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}/weather/forecast?startDate={startDate.ToUniversalTime():yyyy-MM-dd'T'HH:mm:ss'Z'}&lang={HttpUtility.UrlEncode(lang)}", token);
+        }
     }
 }
