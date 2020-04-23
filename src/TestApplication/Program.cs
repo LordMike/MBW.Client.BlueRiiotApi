@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MBW.Client.BlueRiiotApi.BlueApi;
+using MBW.Client.BlueRiiotApi;
 
 namespace TestApplication
 {
