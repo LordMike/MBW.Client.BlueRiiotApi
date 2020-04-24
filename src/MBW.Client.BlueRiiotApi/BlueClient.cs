@@ -1,72 +1,60 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Amazon.Runtime;
-using AwsSignatureVersion4.Private;
-using Genbox.SimpleS3.Core;
-using Genbox.SimpleS3.Core.Abstracts.Enums;
-using Genbox.SimpleS3.Core.Authentication;
+using MBW.Client.BlueRiiotApi.Builder;
 using MBW.Client.BlueRiiotApi.Objects;
-using MBW.Client.BlueRiiotApi.Other;
 using MBW.Client.BlueRiiotApi.RequestsResponses;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace MBW.Client.BlueRiiotApi
 {
-    public class BlueClient : BlueClientBase
+    public class BlueClient
     {
-        private readonly string _token;
-        private readonly string _awsKey;
-        private readonly string _awsSecret;
+        private readonly IHttpClientProducer _httpClientProducer;
+        private readonly IRequestSigner _requestSigner;
+        private readonly JsonSerializer _serializer;
+        private readonly Encoding _encoding = new UTF8Encoding(false);
 
-        public BlueClient(LoginResponse credentials)
+        internal BlueClient(IHttpClientProducer httpClientProducer, IRequestSigner requestSigner)
         {
-            _awsKey = credentials.Credentials.AccessKey;
-            _awsSecret = credentials.Credentials.SecretKey;
-            _token = credentials.Credentials.SessionToken;
+            _httpClientProducer = httpClientProducer;
+            _requestSigner = requestSigner;
+            _serializer = new JsonSerializer();
         }
 
-        private void GenboxSign(HttpRequestMessage request)
+        private T Parse<T>(Stream stream)
         {
-            var opts = Options.Create(new S3Config(new StringAccessKey(_awsKey, _awsSecret), AwsRegion.EuWest1));
-
-            var sigBuilder = new SignatureBuilder(new SigningKeyBuilder(opts, NullLogger<SigningKeyBuilder>.Instance),
-                new ScopeBuilder(opts), NullLogger<SignatureBuilder>.Instance, opts);
-
-            byte[] sig = sigBuilder.CreateSignature(new DummyRequest(request));
-        }
-
-        private async Task Sign(HttpRequestMessage request)
-        {
-            request.AddHeader("User-Agent", "BlueConnect/3.2.1");
-            //.Headers.TryAddWithoutValidation("User-Agent", "Blue Connect/3.2.1 (com.riiotlabs.blue; build:200319.2397; iOS 13.3.1) Alamofire/4.9.1");
-
-            var res = await Signer.SignAsync(GetHttpClient(), request, DateTime.UtcNow, "eu-west-1", "execute-api",
-                new ImmutableCredentials(_awsKey, _awsSecret, _token));
-
-
+            using (StreamReader sr = new StreamReader(stream, _encoding, false, 4096, true))
+            using (JsonTextReader jr = new JsonTextReader(sr))
+                return _serializer.Deserialize<T>(jr);
         }
 
         private async Task<TResponse> PerformGet<TResponse>(string path, CancellationToken token) where TResponse : class
         {
+            HttpClient httpClient = _httpClientProducer.CreateClient();
+
             using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, path);
 
-            await Sign(req);
+            // Login if needed, then sign the request
+            await _requestSigner.LoginIfNeeded(this, token);
+            await _requestSigner.Sign(httpClient, req, token);
 
-            using var resp = await GetHttpClient().SendAsync(req, HttpCompletionOption.ResponseContentRead, token);
+            // Issue the request
+            using HttpResponseMessage resp = await httpClient.SendAsync(req, HttpCompletionOption.ResponseContentRead, token);
 
             if (resp.Content.Headers.ContentType.MediaType != "application/json")
                 throw new Exception($"API request did not result in a Json object. Path: '{path}'.");
 
             JObject obj = Parse<JObject>(await resp.Content.ReadAsStreamAsync());
 
-            if (obj.ContainsKey("errorMessage") && obj.ContainsKey("errorType"))
+            if (obj.ContainsKey("errorMessage")/* && obj.ContainsKey("errorType")*/)
             {
                 // This is an error, regardless of what the status code is
                 throw new Exception($"API responded with an error: {obj.Value<string>("errorMessage")}. Path: '{path}'.");
@@ -76,10 +64,31 @@ namespace MBW.Client.BlueRiiotApi
                 return obj.ToObject<TResponse>();
 
             // Something is wrong, try fetching a message
-            if (obj.TryGetValue("errorMessage", out var errorMsg) || obj.TryGetValue("message", out errorMsg))
+            if (obj.TryGetValue("errorMessage", out JToken? errorMsg) || obj.TryGetValue("message", out errorMsg))
                 throw new Exception($"API resulted in a non-success status code. Message: {errorMsg}. Path: '{path}'.");
 
             throw new Exception($"API resulted in a non-success status code. No futher details available. Path: '{path}'.");
+        }
+
+        internal async Task<LoginResponse> LoginWithUsernamePassword(string email, string password, CancellationToken token = default)
+        {
+            HttpClient httpClient = _httpClientProducer.CreateClient();
+
+            using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "user/login");
+
+            req.Content = new StringContent(JsonConvert.SerializeObject(new
+            {
+                email,
+                password
+            }));
+
+            using HttpResponseMessage resp = await httpClient.SendAsync(req, HttpCompletionOption.ResponseContentRead, token);
+
+            resp.EnsureSuccessStatusCode();
+
+            LoginResponse loginResponse = Parse<LoginResponse>(await resp.Content.ReadAsStreamAsync());
+
+            return loginResponse;
         }
 
         public async Task<SwimmingPoolGetResponse> GetSwimmingPools(bool deleted = false, CancellationToken token = default)
