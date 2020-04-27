@@ -4,6 +4,19 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Version>0.1.0-alpha</Version>
+    <Description>Client implementation for Blue Riiots pool sensor API.</Description>
+    <Authors>LordMike</Authors>
+    <Copyright>Michael Bisbjerg © 2020</Copyright>
+    <PackageTags>blue riiot;client;pool</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/LordMike/MBW.Client.BlueRiiotApi</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/LordMike/MBW.Client.BlueRiiotApi.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageOutputPath>./build</PackageOutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AwsSignatureVersion4" Version="1.2.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.3" />

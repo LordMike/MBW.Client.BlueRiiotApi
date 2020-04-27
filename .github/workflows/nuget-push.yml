@@ -1,0 +1,30 @@
+name: Nuget Upload
+
+on:
+  push:
+    branches: [ nuget ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Pack
+      run: dotnet pack
+    - uses: actions/upload-artifact@v2-preview
+      with:
+        name: MBW.Client.BlueRiiotApi-Nupkg
+        path: MBW.Client.BlueRiiotApi/build/*.nupkg
+    - name: push
+      run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k $NUGET_KEY MBW.Client.BlueRiiotApi/build/*.nupkg
+      env:
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
