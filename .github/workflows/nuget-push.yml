@@ -22,9 +22,9 @@ jobs:
       run: dotnet pack
     - uses: actions/upload-artifact@v2-preview
       with:
-        name: MBW.Client.BlueRiiotApi-Nupkg
-        path: MBW.Client.BlueRiiotApi/build/*.nupkg
+        name: src/MBW.Client.BlueRiiotApi-Nupkg
+        path: src/MBW.Client.BlueRiiotApi/build/*.nupkg
     - name: push
-      run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k $NUGET_KEY MBW.Client.BlueRiiotApi/build/*.nupkg
+      run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k $NUGET_KEY src/MBW.Client.BlueRiiotApi/build/*.nupkg
       env:
         NUGET_KEY: ${{ secrets.NUGET_KEY }}
