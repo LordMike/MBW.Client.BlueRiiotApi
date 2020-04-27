@@ -9,6 +9,7 @@ using System.Web;
 using MBW.Client.BlueRiiotApi.Builder;
 using MBW.Client.BlueRiiotApi.Objects;
 using MBW.Client.BlueRiiotApi.RequestsResponses;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using HttpMethod = System.Net.Http.HttpMethod;
@@ -17,13 +18,15 @@ namespace MBW.Client.BlueRiiotApi
 {
     public class BlueClient
     {
+        private readonly ILogger<BlueClient> _logger;
         private readonly IHttpClientProducer _httpClientProducer;
         private readonly IRequestSigner _requestSigner;
         private readonly JsonSerializer _serializer;
         private readonly Encoding _encoding = new UTF8Encoding(false);
 
-        internal BlueClient(IHttpClientProducer httpClientProducer, IRequestSigner requestSigner)
+        internal BlueClient(ILogger<BlueClient> logger, IHttpClientProducer httpClientProducer, IRequestSigner requestSigner)
         {
+            _logger = logger;
             _httpClientProducer = httpClientProducer;
             _requestSigner = requestSigner;
             _serializer = new JsonSerializer();

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using Microsoft.Extensions.Logging;
 
 namespace MBW.Client.BlueRiiotApi.Builder
 {
@@ -6,6 +7,7 @@ namespace MBW.Client.BlueRiiotApi.Builder
     {
         private IHttpClientProducer _clientProducer;
         private IRequestSigner _requestSigner;
+        private ILogger<BlueClient> _logger;
 
         public BlueClientBuilder()
         {
@@ -27,6 +29,12 @@ namespace MBW.Client.BlueRiiotApi.Builder
         public BlueClientBuilder UseUsernamePassword(string username, string password)
         {
             _requestSigner = new UsernamePasswordRequestSigner(username, password);
+            return this;
+        }
+
+        public BlueClientBuilder UseLogger(ILogger<BlueClient> logger)
+        {
+            _logger = logger;
             return this;
         }
 
