@@ -67,7 +67,7 @@ namespace MBW.Client.BlueRiiotApi
                 return obj.ToObject<TResponse>();
 
             // Something is wrong, try fetching a message
-            if (obj.TryGetValue("errorMessage", out JToken? errorMsg) || obj.TryGetValue("message", out errorMsg))
+            if (obj.TryGetValue("errorMessage", out JToken errorMsg) || obj.TryGetValue("message", out errorMsg))
                 throw new Exception($"API resulted in a non-success status code. Message: {errorMsg}. Path: '{path}'.");
 
             throw new Exception($"API resulted in a non-success status code. No futher details available. Path: '{path}'.");
