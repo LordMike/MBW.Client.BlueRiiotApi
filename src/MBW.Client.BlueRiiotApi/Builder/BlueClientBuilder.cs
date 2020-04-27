@@ -40,7 +40,7 @@ namespace MBW.Client.BlueRiiotApi.Builder
 
         public BlueClient Build()
         {
-            return new BlueClient(_clientProducer, _requestSigner);
+            return new BlueClient(_logger, _clientProducer, _requestSigner);
         }
     }
 }
