@@ -24,5 +24,5 @@ jobs:
       run: dotnet pack
     - uses: actions/upload-artifact@v2-preview
       with:
-        name: src/MBW.Client.BlueRiiotApi-Nupkg
+        name: MBW.Client.BlueRiiotApi-Nupkg
         path: src/MBW.Client.BlueRiiotApi/build/*.nupkg
