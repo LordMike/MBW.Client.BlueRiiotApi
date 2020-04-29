@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Description>Client implementation for Blue Riiots pool sensor API.</Description>
     <Authors>LordMike</Authors>
     <Copyright>Michael Bisbjerg © 2020</Copyright>
@@ -16,6 +16,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageOutputPath>./build</PackageOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="build\**" />
+    <EmbeddedResource Remove="build\**" />
+    <None Remove="build\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AwsSignatureVersion4" Version="1.2.0" />
