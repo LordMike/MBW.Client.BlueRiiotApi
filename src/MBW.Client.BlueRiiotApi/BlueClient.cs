@@ -55,6 +55,15 @@ namespace MBW.Client.BlueRiiotApi
             if (resp.Content.Headers.ContentType.MediaType != "application/json")
                 throw new Exception($"API request did not result in a Json object. Path: '{path}'.");
 
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                // Log request / Response
+                // Note: It should be fine to read the content twice, as HttpCompletionOption.ResponseContentRead is set
+                string responseBody = await resp.Content.ReadAsStringAsync();
+
+                _logger.LogTrace("Received {Code} for {Path}, with body: {Body}", resp.StatusCode, req.RequestUri, responseBody);
+            }
+
             JObject obj = Parse<JObject>(await resp.Content.ReadAsStreamAsync());
 
             if (obj.ContainsKey("errorMessage")/* && obj.ContainsKey("errorType")*/)
@@ -92,6 +101,24 @@ namespace MBW.Client.BlueRiiotApi
             LoginResponse loginResponse = Parse<LoginResponse>(await resp.Content.ReadAsStreamAsync());
 
             return loginResponse;
+        }
+
+        public async Task<BluesGetResponse> GetBlues(HwProductType productType, CancellationToken token = default)
+        {
+            if (productType == HwProductType.unknown)
+                return await PerformGet<BluesGetResponse>("blue", token);
+
+            return await PerformGet<BluesGetResponse>($"blue?blueProductType={productType}", token);
+        }
+
+        public async Task<BlueGetResponse> GetBlue(string serial, CancellationToken token = default)
+        {
+            return await PerformGet<BlueGetResponse>($"blue/{serial}", token);
+        }
+
+        public async Task<BlueCompatibilityGetResponse> GetBlueCompatibility(string serial, CancellationToken token = default)
+        {
+            return await PerformGet<BlueCompatibilityGetResponse>($"blue/{serial}/compatibility", token);
         }
 
         public async Task<SwimmingPoolGetResponse> GetSwimmingPools(bool deleted = false, CancellationToken token = default)
