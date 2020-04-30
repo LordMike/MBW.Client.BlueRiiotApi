@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MBW.Client.BlueRiiotApi.Builder;
+using MBW.Client.BlueRiiotApi.Objects;
 
 namespace TestApplication
 {
@@ -20,8 +21,16 @@ namespace TestApplication
                 .UseUsernamePassword("TODO", "TODO")
                 .Build();
 
+            var blueDevices = await bc.GetBlues(HwProductType.unknown);
+
             var pools = await bc.GetSwimmingPools();
             var pool = pools.Data.First();
+
+            var blueDevicesPool = await bc.GetSwimmingPoolBlueDevices(pool.SwimmingPoolId);
+            var blueDevice = blueDevicesPool.Data.First();
+            
+            var blueDevice2 = await bc.GetBlue(blueDevice.BlueDeviceSerial);
+            var blueCompatibility = await bc.GetBlueCompatibility(blueDevice.BlueDeviceSerial);
 
             var pool2 = await bc.GetSwimmingPool(pool.SwimmingPoolId);
             var feed = await bc.GetSwimmingPoolFeed(pool.SwimmingPoolId);

@@ -13,5 +13,14 @@ namespace MBW.Client.BlueRiiotApi.Objects
 
         [JsonProperty("swimming_pool_id")]
         public string SwimmingPoolId { get; set; }
+        
+        [JsonProperty("blue_device")]
+        public BlueDeviceFromDevicesList BlueDevice { get; set; }
+        
+        [JsonProperty("user_id")]
+        public string UserId { get; set; }
+        
+        [JsonProperty("role")]
+        public string Role { get; set; }
     }
 }
