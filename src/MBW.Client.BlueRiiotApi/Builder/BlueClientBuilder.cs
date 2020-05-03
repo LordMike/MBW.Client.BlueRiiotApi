@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MBW.Client.BlueRiiotApi.Builder
 {
@@ -7,7 +8,7 @@ namespace MBW.Client.BlueRiiotApi.Builder
     {
         private IHttpClientProducer _clientProducer;
         private IRequestSigner _requestSigner;
-        private ILogger<BlueClient> _logger;
+        private ILogger<BlueClient> _logger = NullLogger<BlueClient>.Instance;
 
         public BlueClientBuilder()
         {

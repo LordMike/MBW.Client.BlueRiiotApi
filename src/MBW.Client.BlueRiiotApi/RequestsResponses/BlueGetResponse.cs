@@ -1,4 +1,5 @@
-﻿using MBW.Client.BlueRiiotApi.Objects;
+﻿using System;
+using MBW.Client.BlueRiiotApi.Objects;
 using Newtonsoft.Json;
 
 namespace MBW.Client.BlueRiiotApi.RequestsResponses
@@ -61,5 +62,11 @@ namespace MBW.Client.BlueRiiotApi.RequestsResponses
         
         [JsonProperty("state")]
         public SleepStateObject SleepState { get; set; }
+        
+        [JsonProperty("last_measure_ble")]
+        public DateTime? LastMeasureBle { get; set; }
+        
+        [JsonProperty("last_measure_sigfox")]
+        public DateTime? LastMeasureSigfox { get; set; }
     }
 }
