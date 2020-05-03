@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -114,6 +114,11 @@ namespace MBW.Client.BlueRiiotApi
         public async Task<BlueGetResponse> GetBlue(string serial, CancellationToken token = default)
         {
             return await PerformGet<BlueGetResponse>($"blue/{serial}", token);
+        }
+        
+        public async Task<SwimmingPoolLastMeasurementsGetResponse> GetBlueLastMeasurements(string poolId, string serial, string mode = "blue_and_strip", CancellationToken token = default)
+        {
+            return await PerformGet<SwimmingPoolLastMeasurementsGetResponse>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}/blue/{HttpUtility.UrlEncode(serial)}/lastMeasurements?mode={HttpUtility.UrlEncode(mode)}", token);
         }
 
         public async Task<BlueCompatibilityGetResponse> GetBlueCompatibility(string serial, CancellationToken token = default)
