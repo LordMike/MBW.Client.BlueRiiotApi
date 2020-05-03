@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Description>Client implementation for Blue Riiots pool sensor API.</Description>
     <Authors>LordMike</Authors>
     <Copyright>Michael Bisbjerg © 2020</Copyright>
