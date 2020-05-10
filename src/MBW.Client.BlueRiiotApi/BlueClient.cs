@@ -102,6 +102,11 @@ namespace MBW.Client.BlueRiiotApi
 
             return loginResponse;
         }
+        
+        public async Task<UserGetResponse> GetUser( CancellationToken token = default)
+        {
+            return await PerformGet<UserGetResponse>("user", token);
+        }
 
         public async Task<BluesGetResponse> GetBlues(HwProductType productType, CancellationToken token = default)
         {
