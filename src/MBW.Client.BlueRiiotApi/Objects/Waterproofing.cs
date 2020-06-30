@@ -6,6 +6,7 @@ namespace MBW.Client.BlueRiiotApi.Objects
     public enum Waterproofing
     {
         Liner,
+        Pvc,
         Polyester,
         Fiberglass,
         Coating_Mosaic,

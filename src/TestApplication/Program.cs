@@ -21,14 +21,17 @@ namespace TestApplication
                 .UseUsernamePassword("TODO", "TODO")
                 .Build();
 
-            var blueDevices = await bc.GetBlues(HwProductType.unknown);
+            var user = await bc.GetUser();
 
             var pools = await bc.GetSwimmingPools();
             var pool = pools.Data.First();
 
             var blueDevicesPool = await bc.GetSwimmingPoolBlueDevices(pool.SwimmingPoolId);
             var blueDevice = blueDevicesPool.Data.First();
-            
+
+            var a = await bc.GetSwimmingPoolLastMeasurements(pool.SwimmingPoolId);
+            var b = await bc.GetBlueLastMeasurements(pool.SwimmingPoolId, blueDevice.BlueDeviceSerial);
+
             var blueDevice2 = await bc.GetBlue(blueDevice.BlueDeviceSerial);
             var blueCompatibility = await bc.GetBlueCompatibility(blueDevice.BlueDeviceSerial);
 
