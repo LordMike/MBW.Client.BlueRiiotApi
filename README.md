@@ -1,5 +1,8 @@
 # MBW.Client.BlueRiiotAPI
 
+[![Nuget](https://img.shields.io/nuget/v/MBW.Client.BlueRiiotAPI)](https://nuget.org/packages/MBW.Client.BlueRiiotAPI)
+
+
 Reverse engineered client library for Blue Riiots pool API.
 
 ## Basic usage
