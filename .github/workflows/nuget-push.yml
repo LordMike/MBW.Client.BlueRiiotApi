@@ -19,7 +19,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Pack
-      run: dotnet pack
+      run: dotnet pack --configuration Release
     - uses: actions/upload-artifact@v2-preview
       with:
         name: MBW.Client.BlueRiiotApi-Nupkg
