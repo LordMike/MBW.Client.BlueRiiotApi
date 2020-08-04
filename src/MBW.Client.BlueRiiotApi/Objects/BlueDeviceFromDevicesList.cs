@@ -9,6 +9,9 @@ namespace MBW.Client.BlueRiiotApi.Objects
     /// </summary>
     public class BlueDeviceFromDevicesList
     {
+        [JsonProperty("battery_low")]
+        public bool BatteryLow { get; set; }
+
         [JsonProperty("contract_servicePlan")]
         public string ContractServicePlan { get; set; }
         
@@ -71,5 +74,17 @@ namespace MBW.Client.BlueRiiotApi.Objects
         
         [JsonProperty("wake_period")]
         public int WakePeriod { get; set; }
+        
+        [JsonProperty("last_hello_message_v")]
+        public DateTime? LastHelloMessageV { get; set; }
+        
+        [JsonProperty("last_measure_message")]
+        public DateTime? LastMeasureMessage { get; set; }
+        
+        [JsonProperty("last_measure_message_ble")]
+        public DateTime? LastMeasureMessageBle { get; set; }
+        
+        [JsonProperty("last_measure_message_sigfox")]
+        public DateTime? LastMeasureMessageSigfox { get; set; }
     }
 }
