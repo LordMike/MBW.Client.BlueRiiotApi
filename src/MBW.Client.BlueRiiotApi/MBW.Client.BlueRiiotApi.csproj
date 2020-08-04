@@ -5,16 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.6.0</Version>
     <Description>Client implementation for Blue Riiots pool sensor API.</Description>
-    <Authors>LordMike</Authors>
-    <Copyright>Michael Bisbjerg © 2020</Copyright>
-    <PackageTags>blue riiot;client;pool</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/LordMike/MBW.Client.BlueRiiotApi</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/LordMike/MBW.Client.BlueRiiotApi.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageOutputPath>./build</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
