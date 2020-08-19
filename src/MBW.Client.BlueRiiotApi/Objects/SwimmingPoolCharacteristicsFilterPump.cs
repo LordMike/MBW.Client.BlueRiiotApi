@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MBW.Client.BlueRiiotApi.Objects
 {
@@ -13,5 +14,8 @@ namespace MBW.Client.BlueRiiotApi.Objects
 
         [JsonProperty("operating_type")]
         public string OperatingType { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JToken> ExtraProperties { get; set; }
     }
 }

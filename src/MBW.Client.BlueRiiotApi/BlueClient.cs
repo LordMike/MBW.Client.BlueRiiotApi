@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using MBW.Client.BlueRiiotApi.Builder;
+using MBW.Client.BlueRiiotApi.Helpers;
 using MBW.Client.BlueRiiotApi.Objects;
+using MBW.Client.BlueRiiotApi.Objects.Enums;
 using MBW.Client.BlueRiiotApi.RequestsResponses;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -29,7 +31,10 @@ namespace MBW.Client.BlueRiiotApi
             _logger = logger;
             _httpClientProducer = httpClientProducer;
             _requestSigner = requestSigner;
-            _serializer = new JsonSerializer();
+            _serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
         }
 
         private T Parse<T>(Stream stream)
@@ -44,6 +49,51 @@ namespace MBW.Client.BlueRiiotApi
             HttpClient httpClient = _httpClientProducer.CreateClient();
 
             using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, path);
+
+            // Login if needed, then sign the request
+            await _requestSigner.LoginIfNeeded(this, token);
+            await _requestSigner.Sign(httpClient, req, token);
+
+            // Issue the request
+            using HttpResponseMessage resp = await httpClient.SendAsync(req, HttpCompletionOption.ResponseContentRead, token);
+
+            if (resp.Content.Headers.ContentType.MediaType != "application/json")
+                throw new Exception($"API request did not result in a Json object. Path: '{path}'.");
+
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                // Log request / Response
+                // Note: It should be fine to read the content twice, as HttpCompletionOption.ResponseContentRead is set
+                string responseBody = await resp.Content.ReadAsStringAsync();
+
+                _logger.LogTrace("Received {Code} for {Path}, with body: {Body}", resp.StatusCode, req.RequestUri, responseBody);
+            }
+
+            JObject obj = Parse<JObject>(await resp.Content.ReadAsStreamAsync());
+
+            if (obj.ContainsKey("errorMessage")/* && obj.ContainsKey("errorType")*/)
+            {
+                // This is an error, regardless of what the status code is
+                throw new Exception($"API responded with an error: {obj.Value<string>("errorMessage")}. Path: '{path}'.");
+            }
+
+            if (resp.StatusCode == HttpStatusCode.OK)
+                return obj.ToObject<TResponse>();
+
+            // Something is wrong, try fetching a message
+            if (obj.TryGetValue("errorMessage", out JToken errorMsg) || obj.TryGetValue("message", out errorMsg))
+                throw new Exception($"API resulted in a non-success status code. Message: {errorMsg}. Path: '{path}'.");
+
+            throw new Exception($"API resulted in a non-success status code. No futher details available. Path: '{path}'.");
+        }
+
+        private async Task<TResponse> PerformPut<TRequest, TResponse>(string path, TRequest request, CancellationToken token) where TResponse : class
+        {
+            HttpClient httpClient = _httpClientProducer.CreateClient();
+
+            using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Put, path);
+
+            req.Content = new JsonContent<TRequest>(_serializer, request);
 
             // Login if needed, then sign the request
             await _requestSigner.LoginIfNeeded(this, token);
@@ -102,8 +152,8 @@ namespace MBW.Client.BlueRiiotApi
 
             return loginResponse;
         }
-        
-        public async Task<UserGetResponse> GetUser( CancellationToken token = default)
+
+        public async Task<UserGetResponse> GetUser(CancellationToken token = default)
         {
             return await PerformGet<UserGetResponse>("user", token);
         }
@@ -120,7 +170,7 @@ namespace MBW.Client.BlueRiiotApi
         {
             return await PerformGet<BlueGetResponse>($"blue/{serial}", token);
         }
-        
+
         public async Task<SwimmingPoolLastMeasurementsGetResponse> GetBlueLastMeasurements(string poolId, string serial, string mode = "blue_and_strip", CancellationToken token = default)
         {
             return await PerformGet<SwimmingPoolLastMeasurementsGetResponse>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}/blue/{HttpUtility.UrlEncode(serial)}/lastMeasurements?mode={HttpUtility.UrlEncode(mode)}", token);
@@ -139,6 +189,11 @@ namespace MBW.Client.BlueRiiotApi
         public async Task<SwimmingPool> GetSwimmingPool(string poolId, CancellationToken token = default)
         {
             return await PerformGet<SwimmingPool>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}", token);
+        }
+
+        public async Task<SwimmingPool> PutSwimmingPool(string poolId, SwimmingPool swimmingPool, CancellationToken token = default)
+        {
+            return await PerformPut<SwimmingPool, SwimmingPool>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}", swimmingPool, token);
         }
 
         public async Task<SwimmingPoolFeedGetResponse> GetSwimmingPoolFeed(string poolId, string lang = null, CancellationToken token = default)

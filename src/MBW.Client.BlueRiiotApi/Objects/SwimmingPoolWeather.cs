@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MBW.Client.BlueRiiotApi.Objects
 {
@@ -55,5 +57,8 @@ namespace MBW.Client.BlueRiiotApi.Objects
 
         [JsonProperty("wind_speed_current")]
         public float WindSpeedCurrent { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JToken> ExtraProperties { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MBW.Client.BlueRiiotApi.Objects
 {
@@ -28,5 +29,8 @@ namespace MBW.Client.BlueRiiotApi.Objects
 
         [JsonProperty("references")]
         public List<SwimmingPoolChemistryChemicalPackProductReferencesItem> References { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JToken> ExtraProperties { get; set; }
     }
 }
