@@ -44,56 +44,29 @@ namespace MBW.Client.BlueRiiotApi
                 return _serializer.Deserialize<T>(jr);
         }
 
-        private async Task<TResponse> PerformGet<TResponse>(string path, CancellationToken token) where TResponse : class
+        private Task<TResponse> PerformGet<TResponse>(string path, CancellationToken token) where TResponse : class
         {
-            HttpClient httpClient = _httpClientProducer.CreateClient();
-
-            using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, path);
-
-            // Login if needed, then sign the request
-            await _requestSigner.LoginIfNeeded(this, token);
-            await _requestSigner.Sign(httpClient, req, token);
-
-            // Issue the request
-            using HttpResponseMessage resp = await httpClient.SendAsync(req, HttpCompletionOption.ResponseContentRead, token);
-
-            if (resp.Content.Headers.ContentType.MediaType != "application/json")
-                throw new Exception($"API request did not result in a Json object. Path: '{path}'.");
-
-            if (_logger.IsEnabled(LogLevel.Trace))
-            {
-                // Log request / Response
-                // Note: It should be fine to read the content twice, as HttpCompletionOption.ResponseContentRead is set
-                string responseBody = await resp.Content.ReadAsStringAsync();
-
-                _logger.LogTrace("Received {Code} for {Path}, with body: {Body}", resp.StatusCode, req.RequestUri, responseBody);
-            }
-
-            JObject obj = Parse<JObject>(await resp.Content.ReadAsStreamAsync());
-
-            if (obj.ContainsKey("errorMessage")/* && obj.ContainsKey("errorType")*/)
-            {
-                // This is an error, regardless of what the status code is
-                throw new Exception($"API responded with an error: {obj.Value<string>("errorMessage")}. Path: '{path}'.");
-            }
-
-            if (resp.StatusCode == HttpStatusCode.OK)
-                return obj.ToObject<TResponse>();
-
-            // Something is wrong, try fetching a message
-            if (obj.TryGetValue("errorMessage", out JToken errorMsg) || obj.TryGetValue("message", out errorMsg))
-                throw new Exception($"API resulted in a non-success status code. Message: {errorMsg}. Path: '{path}'.");
-
-            throw new Exception($"API resulted in a non-success status code. No futher details available. Path: '{path}'.");
+            return PerformHttp<object, TResponse>(path, HttpMethod.Get, null, token);
         }
 
-        private async Task<TResponse> PerformPut<TRequest, TResponse>(string path, TRequest request, CancellationToken token) where TResponse : class
+        private Task<TResponse> PerformPut<TRequest, TResponse>(string path, TRequest request, CancellationToken token) where TResponse : class
+        {
+            return PerformHttp<TRequest, TResponse>(path, HttpMethod.Put, request, token);
+        }
+
+        private Task<TResponse> PerformPost<TRequest, TResponse>(string path, TRequest request, CancellationToken token) where TResponse : class
+        {
+            return PerformHttp<TRequest, TResponse>(path, HttpMethod.Post, request, token);
+        }
+
+        private async Task<TResponse> PerformHttp<TRequest, TResponse>(string path, HttpMethod method, TRequest requestBody, CancellationToken token) where TResponse : class
         {
             HttpClient httpClient = _httpClientProducer.CreateClient();
 
-            using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Put, path);
+            using HttpRequestMessage req = new HttpRequestMessage(method, path);
 
-            req.Content = new JsonContent<TRequest>(_serializer, request);
+            if (requestBody != null)
+                req.Content = new JsonContent<TRequest>(_serializer, requestBody);
 
             // Login if needed, then sign the request
             await _requestSigner.LoginIfNeeded(this, token);
@@ -174,6 +147,11 @@ namespace MBW.Client.BlueRiiotApi
         public async Task<SwimmingPoolLastMeasurementsGetResponse> GetBlueLastMeasurements(string poolId, string serial, string mode = "blue_and_strip", CancellationToken token = default)
         {
             return await PerformGet<SwimmingPoolLastMeasurementsGetResponse>($"swimming_pool/{HttpUtility.UrlEncode(poolId)}/blue/{HttpUtility.UrlEncode(serial)}/lastMeasurements?mode={HttpUtility.UrlEncode(mode)}", token);
+        }
+
+        public async Task<BlueReleaseLastUnprocessedEventResponse> BlueReleaseLastUnprocessedEvent(string serial, CancellationToken token = default)
+        {
+            return await PerformPost<object, BlueReleaseLastUnprocessedEventResponse>($"blue/{serial}/releaseLastUnprocessedEvent", null, token);
         }
 
         public async Task<BlueCompatibilityGetResponse> GetBlueCompatibility(string serial, CancellationToken token = default)
