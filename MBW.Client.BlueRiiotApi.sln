@@ -7,7 +7,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8EE42567-ED1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.Client.BlueRiiotApi", "src\MBW.Client.BlueRiiotApi\MBW.Client.BlueRiiotApi.csproj", "{26CA5F8F-98F7-43C0-8498-E64F8AEFAB41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "src\TestApplication\TestApplication.csproj", "{134AFAA6-75A2-47B8-9660-CD482B9BEBCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApplication", "src\TestApplication\TestApplication.csproj", "{134AFAA6-75A2-47B8-9660-CD482B9BEBCE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8499AD12-CCD0-485B-8A10-21DD032A23C0}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Imports", "_Imports", "{FAED88A6-2D6D-4069-A15B-9A3CCE72B517}"
+	ProjectSection(SolutionItems) = preProject
+		_Imports\Local.targets = _Imports\Local.targets
+		_Imports\Test.targets = _Imports\Test.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +61,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{26CA5F8F-98F7-43C0-8498-E64F8AEFAB41} = {8EE42567-ED1E-4F19-B24B-A173B9DE34BC}
 		{134AFAA6-75A2-47B8-9660-CD482B9BEBCE} = {8EE42567-ED1E-4F19-B24B-A173B9DE34BC}
+		{FAED88A6-2D6D-4069-A15B-9A3CCE72B517} = {8499AD12-CCD0-485B-8A10-21DD032A23C0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {063AD595-B1F8-42D6-988E-8FD1E969754D}
