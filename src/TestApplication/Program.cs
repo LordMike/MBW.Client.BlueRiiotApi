@@ -18,7 +18,7 @@ namespace TestApplication
                     // Set a proxy if available. Suggestion: Fiddler.
                     Proxy = new WebProxy(new Uri("http://127.0.0.1:8888"))
                 }))
-                .UseUsernamePassword("TODO", "TODO")
+                .UseUsernamePassword("michael@mbwarez.dk", "g5Y9B8n94dMiHbjt7AVZsBZK")
                 .Build();
 
             var user = await bc.GetUser();
