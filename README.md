@@ -1,6 +1,6 @@
 # MBW.Client.BlueRiiotAPI
 
-[![Nuget](https://img.shields.io/nuget/v/MBW.Client.BlueRiiotAPI)](https://nuget.org/packages/MBW.Client.BlueRiiotAPI)
+[![Generic Build](https://github.com/LordMike/MBW.Client.BlueRiiotApi/actions/workflows/dotnet.yml/badge.svg)](https://github.com/LordMike/MBW.Client.BlueRiiotApi/actions/workflows/dotnet.yml) [![Nuget](https://img.shields.io/nuget/v/MBW.Client.BlueRiiotAPI)](https://nuget.org/packages/MBW.Client.BlueRiiotAPI)
 
 
 Reverse engineered client library for Blue Riiots pool API.
