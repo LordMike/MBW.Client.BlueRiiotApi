@@ -42,7 +42,10 @@ namespace MBW.Client.BlueRiiotApi.Objects
         
         [JsonProperty("hw_type")]
         public string HwType { get; set; }
-        
+
+        [JsonProperty("gateway_id")]
+        public string GatewayId { get; set; }
+
         [JsonProperty("hw_generation")]
         public int HwGeneration { get; set; }
         
@@ -87,6 +90,12 @@ namespace MBW.Client.BlueRiiotApi.Objects
         
         [JsonProperty("last_measure_message_sigfox")]
         public DateTime? LastMeasureMessageSigfox { get; set; }
+        
+        [JsonProperty("last_measure_message_gateway")]
+        public DateTime? LastMeasureMessageGateway { get; set; }
+        
+        [JsonProperty("last_measure_message_gateway_seq_number")]
+        public int? LastMeasureMessageGatewaySequenceNumber { get; set; }
 
         [JsonExtensionData]
         public Dictionary<string, JToken> ExtraProperties { get; set; }
