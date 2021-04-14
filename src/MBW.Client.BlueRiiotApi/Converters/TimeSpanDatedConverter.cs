@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 
 namespace MBW.Client.BlueRiiotApi.Converters
@@ -14,10 +14,13 @@ namespace MBW.Client.BlueRiiotApi.Converters
 
         public override TimeSpan ReadJson(JsonReader reader, Type objectType, TimeSpan existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            DateTime? dateTime = (DateTime?) reader.Value;
-
-            //DateTime? dateTime = reader.ReadAsDateTime();
-            return dateTime.Value.TimeOfDay;
+            if (!(reader.Value is DateTime asDateTime))
+            {
+                // https://github.com/LordMike/MBW.BlueRiiot2MQTT/issues/44
+                throw new Exception($"Unable to parse value as TimeSpan. Received: '{reader.Value}'");
+            }
+            
+            return asDateTime.TimeOfDay;
         }
     }
 }
