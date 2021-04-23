@@ -2,7 +2,7 @@
 
   <!-- Package -->
   <PropertyGroup>
-    <Product>MBW.Libraries.DeviceObjectLib</Product>
+    <Product>MBW.Client.BlueRiiotApi</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/LordMike/MBW.Client.BlueRiiotApi</PackageProjectUrl>
   </PropertyGroup>
