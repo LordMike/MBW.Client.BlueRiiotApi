@@ -21,15 +21,15 @@ namespace MBW.Client.BlueRiiotApi
     public class BlueClient
     {
         private readonly ILogger<BlueClient> _logger;
-        private readonly IHttpClientProducer _httpClientProducer;
+        private readonly IBlueRiiotHttpClientFactory _blueRiiotHttpClientFactory;
         private readonly IRequestSigner _requestSigner;
         private readonly JsonSerializer _serializer;
         private readonly Encoding _encoding = new UTF8Encoding(false);
 
-        internal BlueClient(ILogger<BlueClient> logger, IHttpClientProducer httpClientProducer, IRequestSigner requestSigner)
+        internal BlueClient(ILogger<BlueClient> logger, IBlueRiiotHttpClientFactory blueRiiotHttpClientFactory, IRequestSigner requestSigner)
         {
             _logger = logger;
-            _httpClientProducer = httpClientProducer;
+            _blueRiiotHttpClientFactory = blueRiiotHttpClientFactory;
             _requestSigner = requestSigner;
             _serializer = JsonSerializer.Create(new JsonSerializerSettings
             {
@@ -61,7 +61,7 @@ namespace MBW.Client.BlueRiiotApi
 
         private async Task<TResponse> PerformHttp<TRequest, TResponse>(string path, HttpMethod method, TRequest requestBody, CancellationToken token) where TResponse : class
         {
-            HttpClient httpClient = _httpClientProducer.CreateClient();
+            HttpClient httpClient = _blueRiiotHttpClientFactory.CreateClient();
 
             using HttpRequestMessage req = new HttpRequestMessage(method, path);
 
@@ -107,7 +107,7 @@ namespace MBW.Client.BlueRiiotApi
 
         internal async Task<LoginResponse> LoginWithUsernamePassword(string email, string password, CancellationToken token = default)
         {
-            HttpClient httpClient = _httpClientProducer.CreateClient();
+            HttpClient httpClient = _blueRiiotHttpClientFactory.CreateClient();
 
             using HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "user/login");
 

@@ -6,24 +6,18 @@ namespace MBW.Client.BlueRiiotApi.Builder
 {
     public class BlueClientBuilder
     {
-        private IHttpClientProducer _clientProducer;
+        private IBlueRiiotHttpClientFactory _clientFactory;
         private IRequestSigner _requestSigner;
         private ILogger<BlueClient> _logger = NullLogger<BlueClient>.Instance;
 
         public BlueClientBuilder()
         {
-            _clientProducer = new ConstantHttpClientProducer(new HttpClient());
+            _clientFactory = new ConstantBlueRiiotHttpClientFactory(new HttpClient());
         }
 
-        public BlueClientBuilder UseHttpClientFactory(IHttpClientFactory factory, string clientName)
+        internal BlueClientBuilder UseHttpClientProducer(IBlueRiiotHttpClientFactory factory)
         {
-            _clientProducer = new HttpClientFactoryProducer(factory, clientName);
-            return this;
-        }
-
-        public BlueClientBuilder UseHttpClient(HttpClient client)
-        {
-            _clientProducer = new ConstantHttpClientProducer(client);
+            _clientFactory = factory;
             return this;
         }
 
@@ -41,7 +35,7 @@ namespace MBW.Client.BlueRiiotApi.Builder
 
         public BlueClient Build()
         {
-            return new BlueClient(_logger, _clientProducer, _requestSigner);
+            return new BlueClient(_logger, _clientFactory, _requestSigner);
         }
     }
 }
