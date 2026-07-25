@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <IsPackable>true</IsPackable>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Client implementation for Blue Riiots pool sensor API</Description>
     <PackageTags>blue riiot;client;pool</PackageTags>
